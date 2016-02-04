@@ -28,7 +28,7 @@ passwd -l nginx
 
 # Step #2: Create Isolated Environment
 echo "Creating basic filesystem structure..."
-mkdir -p ${NGINX_JAIL}/{etc,etc/nginx,dev,var,var/log,var/log/nginx,/var/lib,/var/lib/nginx,var/run,usr,usr/sbin,tmp,var/tmp,lib64,home,home/nginx}
+mkdir -p ${NGINX_JAIL}/{run,etc,etc/nginx,dev,var,var/log,var/log/nginx,/var/lib,/var/lib/nginx,var/run,usr,usr/sbin,tmp,var/tmp,lib64,home,home/nginx}
 chmod 1777 ${NGINX_JAIL}/tmp
 chmod 1777 ${NGINX_JAIL}/var/tmp
 
@@ -54,38 +54,7 @@ ${INSTALL_FILES}/n2chroot /usr/sbin/nginx
 /bin/cp -fv /lib64/* ${NGINX_JAIL}/lib64
 
 # apparently, n2chroot misses these two libs:
-/bin/cp -fv /lib/{libnss_compat.so.2,libnsl.so.1,libnss_nis.so.2,libnss_files.so.2} ${NGINX_JAIL}/lib
-# if you are still missing libs, you can strace chrooted nginx as described here:
-# http://forum.nginx.org/read.php?2,163489,163540#msg-163540
-
-echo "Creating basic filesystem structure..."
-mkdir -p ${NGINX_JAIL}/{etc,etc/nginx,dev,var,var/log,var/log/nginx,/var/lib,/var/lib/nginx,var/run,usr,usr/sbin,tmp,var/tmp,lib64,home,home/nginx}
-chmod 1777 ${NGINX_JAIL}/tmp
-chmod 1777 ${NGINX_JAIL}/var/tmp
-
-# Step #3: Create Required Devices in ${NGINX_JAIL}/dev
-echo "Creating required devices..."
-cd ${NGINX_JAIL}
-ls -l /dev/{null,random,urandom}
-/bin/mknod -m 0666 ${NGINX_JAIL}/dev/null c 1 3
-/bin/mknod -m 0666 ${NGINX_JAIL}/dev/random c 1 8
-/bin/mknod -m 0444 ${NGINX_JAIL}/dev/urandom c 1 9
-
-# Step #4: Copy All Nginx Files In Directory
-echo "Copying nginx files..."
-/bin/cp -farv /etc/nginx/* ${NGINX_JAIL}/etc/nginx
-/bin/cp /usr/sbin/nginx ${NGINX_JAIL}/usr/sbin/
-
-# Step #5: Copy Required Libs To Jail
-# Uses n2chroot from http://bash.cyberciti.biz/web-server/nginx-chroot-helper-bash-shell-script/
-# n2chroot must be edited to set BASE directory! Would prefer to pass ${NGINX_JAIL} parameter
-echo "Copying libs..."
-chmod +x ${INSTALL_FILES}/n2chroot
-${INSTALL_FILES}/n2chroot /usr/sbin/nginx
-/bin/cp -fv /lib64/* ${NGINX_JAIL}/lib64
-
-# apparently, n2chroot misses these two libs:
-/bin/cp -fv /lib/{libnss_compat.so.2,libnsl.so.1,libnss_nis.so.2,libnss_files.so.2} ${NGINX_JAIL}/lib
+/bin/cp -fv /lib/x86_64-linux-gnu/{libnss_compat.so.2,libnsl.so.1,libnss_nis.so.2,libnss_files.so.2} ${NGINX_JAIL}/lib/x86_64-linux-gnu
 # if you are still missing libs, you can strace chrooted nginx as described here:
 # http://forum.nginx.org/read.php?2,163489,163540#msg-163540
 
